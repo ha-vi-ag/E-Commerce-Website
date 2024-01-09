@@ -1,0 +1,21 @@
+<%- include('../includes/head.ejs') %>
+    <title>
+        <%= pageTitle %>
+    </title>
+    </head>
+<body>
+        <%- include('../includes/header.ejs') %>
+
+        <div class="form-style-8">
+            <h2>Edit Product Details</h2>
+            <form action="/admin/edit-product" method="POST">
+                <input type="hidden" name="id" value="<%= product.id %>">
+                <input type="text" name="title" placeholder="Title" value="<%= product.title %>"/>
+                <input type="number" name="price" placeholder="Price" value="<%= product.price %>"/>
+                <input type="text" name="imageUrl" placeholder="ImageUrl" value="<%= product.imageUrl %>"/>
+                <textarea name="description" placeholder="Description"><%= product.description %></textarea>
+                <button type="submit">Save Changes</button>
+            </form>
+        </div>
+
+<%- include('../includes/end.ejs') %>

@@ -1,0 +1,29 @@
+<%- include('../includes/head.ejs') %>
+    <title><%= pageTitle %></title>
+</head>
+<body>
+
+    <%- include('../includes/header.ejs') %>
+
+    <% if(products.length <=0) { %>
+        <h1>No Product Found</h1>
+        <% } else { %>
+
+            <div class="content">
+
+                <% products.forEach(product => { %>
+                    <div class="card">
+                        <img src="<%= product.imageUrl%>"
+                            alt="Denim Jeans" style="width:100%">
+                        <h1><%= product.title %></h1>
+                        <p class="price">$<%= product.price %></p>
+                        <p><%= product.description %></p>
+                        <p class="link"><a href="/addtocart/<%= product.id %>">Add to Cart</a></p>
+                    </div>
+                <% }); %>
+            </div>
+
+        <% } %>
+
+<%- include('../includes/end.ejs') %>
+    

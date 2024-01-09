@@ -1,0 +1,31 @@
+<%- include('../includes/head.ejs') %>
+    <title>
+        <%= pageTitle %>
+    </title>
+    </head>
+
+    <body>
+
+        <%- include('../includes/header.ejs') %>
+
+        <% if (products.length <= 0) { %>
+            <h1>No Products in Cart</h1>
+        <% } else { %>
+            <div>
+                <% products.forEach(product => { %>
+                    <div class="cartItem">
+                        <div class="cartImage">
+                            <img src="<%= product.imageUrl %>" alt="productImage">
+                        </div>
+                        <div class="cartProductDetails">
+                            <div>Title: <%= product.title %></div>
+                            <div>Price: $<%= product.price %></div>
+                            <div>Description: <%= product.description %></div>
+                            <div>Quantity: <%= product.qty %></div>
+                        </div>
+                    </div>
+                <% }); %>    
+            </div>
+        <% } %>
+
+<%- include('../includes/end.ejs') %>
