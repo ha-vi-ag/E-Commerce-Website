@@ -1,14 +1,43 @@
 const path = require("path");
 const fs = require("fs");
 
+const Products = require("./products");
 const p = path.join(__dirname, "..", "Data", "carts.json");
 
 module.exports = class Cart {
-  static fetchProducts(cb) {
+  static fetchProducts(callback) {
     fs.readFile(p, "utf-8", (err, products) => {
       let prods = [];
       if (products.length > 0) prods = JSON.parse(products);
-      cb(prods);
+      callback(prods);
+    });
+  }
+
+  static fetchProductsWithDetails(callback) {
+    Cart.fetchProducts((products) => {
+      const productsList = products.map((p) => {
+        return new Promise((resolve, reject) => {
+          Products.findById(p.id)
+            .then((product) => {
+              const productDetails = {
+                ...product,
+                qty: p.qty,
+                price: product.price * p.qty,
+              };
+              resolve(productDetails);
+            })
+            .catch(reject);
+        });
+      });
+      Promise.all(productsList).then((products) => {
+        callback(products);
+      });
+    });
+  }
+
+  static writeIntoDb(products, resolve, reject) {
+    fs.writeFile(p, JSON.stringify(products), (err) => {
+      err ? reject(err) : resolve();
     });
   }
 
@@ -16,41 +45,26 @@ module.exports = class Cart {
     return new Promise((resolve, reject) => {
       Cart.fetchProducts((products) => {
         const prods = products.filter((product) => product.id != id);
-
-        fs.writeFile(p, JSON.stringify(prods), (err) => {
-          if (err) reject(err);
-          else resolve();
-        });
+        Cart.writeIntoDb(prods, resolve, reject);
       });
     });
   }
 
-  static addToCart(product, qty) {
+  static addToCart(productId) {
     return new Promise((resolve, reject) => {
       Cart.fetchProducts((products) => {
-        let flag = true;
-        for (let i = 0; i < products.length; i++) {
-          if (products[i].id == product.id) {
-            const preQuantity = products[i].qty;
-            products[i] = {
-              ...product,
-              qty: qty + preQuantity,
-              price: product.price * (qty + preQuantity),
-            };
+        const index = products.findIndex((p) => p.id == productId);
+        if (index == -1) products.push({ id: productId, qty: 1 });
+        else products[index].qty += 1;
 
-            console.log(products[i]);
-            flag = false;
-            break;
-          }
-        }
-        if (flag && qty > 0) products.push({ ...product, qty: qty });
-
-        console.log(products);
-        fs.writeFile(p, JSON.stringify(products), (err) => {
-          if (err) reject(err);
-          else resolve();
-        });
+        Cart.writeIntoDb(products, resolve, reject);
       });
+    });
+  }
+
+  static emptyCart() {
+    return new Promise((resolve, reject) => {
+      Cart.writeIntoDb([], resolve, reject);
     });
   }
 };

@@ -191,3 +191,26 @@ body {
     width: 150px;
     height: 150px;
 }
+
+
+.cartProductDetails a {
+    text-decoration: none;
+    border: none;
+    border-bottom: blue 1px solid;
+    padding-bottom: 5px;
+    color: blue;
+}
+
+.cartProductDetails .remove-link {
+    margin-top: 10px;
+}
+
+.purchase a{
+    text-decoration: none;
+    color: red;
+    font-size: 25px;
+}
+
+.purchase {
+    text-align: center;
+}

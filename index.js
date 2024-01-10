@@ -26,4 +26,4 @@ app.use("/", (req, res, next) => {
   res.render("404", { pageTitle: "Error" });
 });
 
-app.listen(3000, () => console.log("server started running at port 3000"));
+app.listen(3000, () => console.log("server started"));
