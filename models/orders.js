@@ -1,36 +1,28 @@
-const path = require("path");
-const fs = require("fs");
+const mongoose = require("mongoose");
 
-const p = path.join(__dirname, "..", "Data", "orders.json");
+const Schema = mongoose.Schema;
 
-module.exports = class Orders {
-  static fetchRecords(callback) {
-    fs.readFile(p, "utf-8", (err, records) => {
-      let recordList = records.length > 0 ? JSON.parse(records) : [];
-      callback(recordList);
-    });
-  }
+const orderSchema = new Schema({
+  products: [
+    {
+      products: Object,
+      quantity: {
+        type: Number,
+        required: true,
+      },
+    },
+  ],
+  user: {
+    name: {
+      type: String,
+      required: true,
+    },
+    userId: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: "Users",
+    },
+  },
+});
 
-  static writeRecordsIntoDb(records, resolve, reject) {
-    fs.writeFile(p, JSON.stringify(records), (err) => {
-      err ? reject(err) : resolve();
-    });
-  }
-
-  static addDetails(products) {
-    return new Promise((resolve, reject) => {
-      Orders.fetchRecords((records) => {
-        products.forEach((p) => {
-          records.push({
-            title: p.title,
-            price: p.price,
-            qty: p.qty,
-            imageUrl: p.imageUrl,
-            orderDate: new Date(),
-          });
-        });
-        Orders.writeRecordsIntoDb(records, resolve, reject);
-      });
-    });
-  }
-};
+module.exports = mongoose.model("Orders", orderSchema);
