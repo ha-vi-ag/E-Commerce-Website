@@ -14,4 +14,8 @@ routes.get("/addtocart/:productId", handlers.addToCart);
 
 routes.get("/orders", handlers.getOrders);
 
+routes.get("/remove-from-cart/:productId", handlers.removeCartProduct);
+
+routes.get("/purchase", handlers.purchaseItems);
+
 module.exports = routes;

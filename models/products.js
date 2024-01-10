@@ -4,59 +4,51 @@ const fs = require("fs");
 const p = path.join(__dirname, "..", "Data", "db.json");
 
 module.exports = class Products {
-  static fetchProducts(cb) {
+  static fetchAllProducts(callback) {
     fs.readFile(p, "utf-8", (err, products) => {
-      let prods = [];
-      if (products.length > 0) prods = JSON.parse(products);
-      cb(prods);
+      let prods = products.length > 0 ? JSON.parse(products) : [];
+      callback(prods);
+    });
+  }
+
+  static findById(id) {
+    return new Promise((resolve, reject) => {
+      Products.fetchAllProducts((products) => {
+        const product = products.filter((p) => p.id == id)[0];
+        resolve(product);
+      });
+    });
+  }
+
+  static writeIntoDb(products, resolve, reject) {
+    fs.writeFile(p, JSON.stringify(products), (err) => {
+      err ? reject(err) : resolve();
     });
   }
 
   static updateProduct(product) {
     return new Promise((resolve, reject) => {
-      Products.fetchProducts((products) => {
-        for (let i = 0; i < products.length; i++) {
-          if (products[i].id == product.id) {
-            products[i] = { ...product };
-            break;
-          }
-        }
-
-        fs.writeFile(p, JSON.stringify(products), (err) => {
-          if (err) reject(err);
-          else resolve();
-        });
+      Products.fetchAllProducts((products) => {
+        products = products.map((p) => (p.id != product.id ? p : product));
+        Products.writeIntoDb(products, resolve, reject);
       });
     });
   }
 
   static deleteProduct(id) {
     return new Promise((resolve, reject) => {
-      Products.fetchProducts((products) => {
+      Products.fetchAllProducts((products) => {
         const newProductsList = products.filter((product) => product.id != id);
-        fs.writeFile(p, JSON.stringify(newProductsList), (err) => {
-          if (err) reject(err);
-          else resolve();
-        });
+        Products.writeIntoDb(newProductsList, resolve, reject);
       });
     });
   }
 
   static addNewProduct(productDetails) {
-    const title = productDetails.title;
-    const price = productDetails.price;
-    const imageUrl = productDetails.imageUrl;
-    const description = productDetails.description;
-    const id = new Date();
-
     return new Promise((resolve, reject) => {
-      Products.fetchProducts((prods) => {
-        prods.push({ title, price, imageUrl, description, id });
-
-        fs.writeFile(p, JSON.stringify(prods), (err) => {
-          if (err) reject(err);
-          else resolve();
-        });
+      Products.fetchAllProducts((prods) => {
+        prods.push({ ...productDetails, id: new Date() });
+        Products.writeIntoDb(prods, resolve, reject);
       });
     });
   }
