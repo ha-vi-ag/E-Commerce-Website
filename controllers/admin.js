@@ -1,22 +1,35 @@
 const Products = require("../models/products");
-const Cart = require("../models/carts");
 
 exports.getAddProduct = (req, res, next) => {
   res.render("admin/add-product", { pageTitle: "Add Product" });
 };
 
+exports.postAddProduct = (req, res, next) => {
+  const product = new Products({ ...req.body });
+  // save method doesn't return promise but mongoose provide then and catch
+  product
+    .save()
+    .then((result) => {
+      res.redirect("/");
+    })
+    .catch(console.log);
+};
+
 exports.getEditProduct = (req, res, next) => {
-  Products.fetchAllProducts((products) => {
-    res.render("admin/edit-product", {
-      pageTitle: "Edit Product",
-      products: products,
-    });
-  });
+  // this is a static method
+  Products.find()
+    .then((products) => {
+      res.render("admin/edit-product", {
+        pageTitle: "Edit Product",
+        products: products,
+      });
+    })
+    .catch(console.log);
 };
 
 exports.editProduct = (req, res, next) => {
   const id = req.params.productId;
-  Products.fetchAllProducts((products) => {
+  Products.find().then((products) => {
     const product = products.filter((product) => product.id == id);
     res.render("admin/edit-page", {
       pageTitle: "Edit Details",
@@ -27,21 +40,24 @@ exports.editProduct = (req, res, next) => {
 
 exports.updateProduct = (req, res, next) => {
   const id = req.body.id;
-  Products.updateProduct(req.body)
+  Products.findById(id)
+    .then((product) => {
+      // product here will not be just only javascript object
+      // instead mongoose return it as mongoose object
+      product.title = req.body.title;
+      product.price = req.body.price;
+      product.imageUrl = req.body.imageUrl;
+      product.description = req.body.description;
+      return product.save();
+    })
     .then(() => res.redirect("/"))
     .catch(console.log);
 };
 
 exports.deleteProduct = (req, res, next) => {
   const id = req.params.productId;
-  Products.deleteProduct(id)
-    .then(() => Cart.deleteItem(id))
+  Products.findByIdAndDelete(id)
+    .then(() => Cart.findByIdAndDelete(id))
     .then(() => res.redirect("/admin/edit-product"))
-    .catch(console.log);
-};
-
-exports.postAddProduct = (req, res, next) => {
-  Products.addNewProduct(req.body)
-    .then(() => res.redirect("/"))
     .catch(console.log);
 };

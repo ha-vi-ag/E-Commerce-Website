@@ -11,22 +11,22 @@
         <% if (records.length <= 0) { %>
             <h1>No Order Details</h1>
         <% } else { %>
-            <% records.forEach(product=> { %>
+            <% records.forEach(records => { %>
+                <% records.forEach(record => { %>
                 <div class="cartItem">
                     <div class="cartImage">
-                        <img src="<%= product.imageUrl %>" alt="productImage">
+                        <img src="<%= record.products.imageUrl %>" alt="productImage">
                     </div>
                     <div class="cartProductDetails">
-                        <div>Title: <%= product.title %>
+                        <div>Title: <%= record.products.title %>
                         </div>
-                        <div>Price: $<%= product.price %>
+                        <div>Price: $<%= record.products.price %>
                         </div>
-                        <div>Quantity: <%= product.qty %>
-                        </div>
-                        <div>Date Of Purchase: <%= product.orderDate.substr(0,10) %>
-                        </div>
+                        <div>Quantity: <%= record.quantity %>
+                        </div> 
                     </div>
                 </div>
+                <% }); %>
             <% }); %>
         <% } %>
 

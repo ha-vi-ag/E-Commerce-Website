@@ -1,44 +1,69 @@
 const Products = require("../models/products");
-const Cart = require("../models/carts");
+const Users = require("../models/users");
 const Orders = require("../models/orders");
 
 exports.getHome = (req, res, next) => {
-  Products.fetchAllProducts((prods) => {
-    res.render("shop/shop", { pageTitle: "Shop", products: prods });
+  Products.find().then((products) => {
+    res.render("shop/shop", { pageTitle: "Shop", products: products });
   });
 };
 
 exports.getCart = (req, res, next) => {
-  Cart.fetchProductsWithDetails((products) => {
-    res.render("shop/cart", { pageTitle: "Cart", products: products });
-  });
+  req.user
+    .populate("cart.items.productId")
+    .then((user) => {
+      res.render("shop/cart", {
+        pageTitle: "Cart",
+        products: user.cart.items,
+      });
+    })
+    .catch(console.log);
 };
 
 exports.removeCartProduct = (req, res, next) => {
   const id = req.params.productId;
-  Cart.deleteItem(id)
+  req.user
+    .removeFromCart(id)
     .then(() => res.redirect("/cart"))
     .catch(console.log);
 };
 
 exports.addToCart = (req, res, next) => {
   const id = req.params.productId;
-
-  Cart.addToCart(id)
+  req.user
+    .addToCart(id)
     .then(() => res.redirect("/cart"))
     .catch(console.log);
 };
 
 exports.getOrders = (req, res, next) => {
-  Orders.fetchRecords((records) => {
+  Orders.find({ "user.userId": req.user.id }).then((records) => {
+    records = records.map((rec) => rec.products);
     res.render("shop/orders", { pageTitle: "Orders", records: records });
   });
 };
 
 exports.purchaseItems = (req, res, next) => {
-  Cart.fetchProductsWithDetails((products) => {
-    Orders.addDetails(products)
-      .then(() => Cart.emptyCart())
+  req.user.populate("cart.items.productId").then((user) => {
+    const prods = user.cart.items.map((p) => {
+      return {
+        quantity: p.quantity,
+        products: { ...p.productId },
+      };
+    });
+    const order = new Orders({
+      products: prods,
+      user: {
+        name: req.user.name,
+        userId: req.user,
+      },
+    });
+    order
+      .save()
+      .then(() => {
+        req.user.cart = { items: [] };
+        return req.user.save();
+      })
       .then(() => res.redirect("/"))
       .catch(console.log);
   });

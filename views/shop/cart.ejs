@@ -12,14 +12,14 @@
             <% products.forEach(product => { %>
                 <div class="cartItem">
                     <div class="cartImage">
-                        <img src="<%= product.imageUrl %>" alt="productImage">
+                        <img src="<%= product.productId.imageUrl %>" alt="productImage">
                     </div>
                     <div class="cartProductDetails">
-                        <div>Title: <%= product.title %></div>
-                        <div>Price: $<%= product.price %></div>
-                        <div>Description: <%= product.description %></div>
-                        <div>Quantity: <%= product.qty %></div>
-                        <div class="remove-link"><a href="/remove-from-cart/<%= product.id %>">Remove</a></div>
+                        <div>Title: <%= product.productId.title %></div>
+                        <div>Price: $<%= product.productId.price * product.quantity %></div>
+                        <div>Description: <%= product.productId.description %></div>
+                        <div>Quantity: <%= product.quantity %></div>
+                        <div class="remove-link"><a href="/remove-from-cart/<%= product.productId.id %>">Remove</a></div>
                     </div>
                 </div>
             <% }); %> 
