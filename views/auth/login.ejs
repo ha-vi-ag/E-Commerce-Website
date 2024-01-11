@@ -1,0 +1,19 @@
+<%- include('../includes/head.ejs') %>
+    <title>
+        <%= pageTitle %>
+    </title>
+    </head>
+
+    <body>
+        <%- include('../includes/header.ejs') %>
+
+            <div class="form-style-8">
+                <h2>Enter Login Details</h2>
+                <form action="/login" method="POST">
+                    <input type="text" name="email" placeholder="Email"/>
+                    <input type="password" name="password" placeholder="Password"/>
+                    <button type="submit">Login</button>
+                </form>
+            </div>
+
+            <%- include('../includes/end.ejs') %>
