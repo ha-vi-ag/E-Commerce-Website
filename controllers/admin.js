@@ -1,7 +1,10 @@
 const Products = require("../models/products");
 
 exports.getAddProduct = (req, res, next) => {
-  res.render("admin/add-product", { pageTitle: "Add Product" });
+  res.render("admin/add-product", {
+    pageTitle: "Add Product",
+    isAuthenticated: req.session.isLoggedIn,
+  });
 };
 
 exports.postAddProduct = (req, res, next) => {
@@ -22,6 +25,7 @@ exports.getEditProduct = (req, res, next) => {
       res.render("admin/edit-product", {
         pageTitle: "Edit Product",
         products: products,
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch(console.log);
@@ -34,6 +38,7 @@ exports.editProduct = (req, res, next) => {
     res.render("admin/edit-page", {
       pageTitle: "Edit Details",
       product: product[0],
+      isAuthenticated: req.session.isLoggedIn,
     });
   });
 };

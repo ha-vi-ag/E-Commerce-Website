@@ -4,7 +4,11 @@ const Orders = require("../models/orders");
 
 exports.getHome = (req, res, next) => {
   Products.find().then((products) => {
-    res.render("shop/shop", { pageTitle: "Shop", products: products });
+    res.render("shop/shop", {
+      pageTitle: "Shop",
+      products: products,
+      isAuthenticated: req.session.isLoggedIn,
+    });
   });
 };
 
@@ -15,6 +19,7 @@ exports.getCart = (req, res, next) => {
       res.render("shop/cart", {
         pageTitle: "Cart",
         products: user.cart.items,
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch(console.log);
@@ -39,7 +44,11 @@ exports.addToCart = (req, res, next) => {
 exports.getOrders = (req, res, next) => {
   Orders.find({ "user.userId": req.user.id }).then((records) => {
     records = records.map((rec) => rec.products);
-    res.render("shop/orders", { pageTitle: "Orders", records: records });
+    res.render("shop/orders", {
+      pageTitle: "Orders",
+      records: records,
+      isAuthenticated: req.session.isLoggedIn,
+    });
   });
 };
 

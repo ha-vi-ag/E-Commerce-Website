@@ -214,3 +214,18 @@ body {
 .purchase {
     text-align: center;
 }
+
+.logout {
+    color: white;
+    border: none;
+    margin-top: 13px;
+    cursor: pointer;
+    font-size: 15px;
+    background: none;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.logout:hover {
+    background-color: black;
+
+}

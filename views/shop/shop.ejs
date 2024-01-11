@@ -18,7 +18,9 @@
                         <h1><%= product.title %></h1>
                         <p class="price">$<%= product.price %></p>
                         <p><%= product.description %></p>
-                        <p class="link"><a href="/addtocart/<%= product.id %>">Add to Cart</a></p>
+                        <% if(isAuthenticated) { %>
+                            <p class="link"><a href="/addtocart/<%= product.id %>">Add to Cart</a></p>
+                        <% } %>
                     </div>
                 <% }); %>
             </div>
