@@ -3,19 +3,20 @@ const express = require("express");
 
 // user defined packages
 const handlers = require("../controllers/shop");
+const isAuth = require("../middleware/is-auth");
 
 const routes = express.Router();
 
 routes.get("/", handlers.getHome);
 
-routes.get("/cart", handlers.getCart);
+routes.get("/cart", isAuth, handlers.getCart);
 
-routes.get("/addtocart/:productId", handlers.addToCart);
+routes.get("/addtocart/:productId", isAuth, handlers.addToCart);
 
-routes.get("/orders", handlers.getOrders);
+routes.get("/orders", isAuth, handlers.getOrders);
 
-routes.get("/remove-from-cart/:productId", handlers.removeCartProduct);
+routes.get("/remove-from-cart/:productId", isAuth, handlers.removeCartProduct);
 
-routes.get("/purchase", handlers.purchaseItems);
+routes.get("/purchase", isAuth, handlers.purchaseItems);
 
 module.exports = routes;

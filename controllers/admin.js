@@ -1,9 +1,9 @@
 const Products = require("../models/products");
+const Users = require("../models/users");
 
 exports.getAddProduct = (req, res, next) => {
   res.render("admin/add-product", {
     pageTitle: "Add Product",
-    isAuthenticated: req.session.isLoggedIn,
   });
 };
 
@@ -25,7 +25,6 @@ exports.getEditProduct = (req, res, next) => {
       res.render("admin/edit-product", {
         pageTitle: "Edit Product",
         products: products,
-        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch(console.log);
@@ -38,7 +37,6 @@ exports.editProduct = (req, res, next) => {
     res.render("admin/edit-page", {
       pageTitle: "Edit Details",
       product: product[0],
-      isAuthenticated: req.session.isLoggedIn,
     });
   });
 };
@@ -62,7 +60,13 @@ exports.updateProduct = (req, res, next) => {
 exports.deleteProduct = (req, res, next) => {
   const id = req.params.productId;
   Products.findByIdAndDelete(id)
-    .then(() => Cart.findByIdAndDelete(id))
+    .then(() => {
+      return Users.find();
+    })
+    .then((users) => {
+      const promiseArray = users.map((user) => user.removeFromCart(id));
+      return Promise.all(promiseArray);
+    })
     .then(() => res.redirect("/admin/edit-product"))
     .catch(console.log);
 };

@@ -7,7 +7,6 @@ exports.getHome = (req, res, next) => {
     res.render("shop/shop", {
       pageTitle: "Shop",
       products: products,
-      isAuthenticated: req.session.isLoggedIn,
     });
   });
 };
@@ -19,7 +18,6 @@ exports.getCart = (req, res, next) => {
       res.render("shop/cart", {
         pageTitle: "Cart",
         products: user.cart.items,
-        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch(console.log);
@@ -47,7 +45,6 @@ exports.getOrders = (req, res, next) => {
     res.render("shop/orders", {
       pageTitle: "Orders",
       records: records,
-      isAuthenticated: req.session.isLoggedIn,
     });
   });
 };
@@ -63,7 +60,7 @@ exports.purchaseItems = (req, res, next) => {
     const order = new Orders({
       products: prods,
       user: {
-        name: req.user.name,
+        email: req.user.email,
         userId: req.user,
       },
     });

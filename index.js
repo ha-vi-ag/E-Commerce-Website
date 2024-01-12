@@ -5,6 +5,8 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const session = require("express-session");
 const MongodbStore = require("connect-mongodb-session")(session);
+const csrf = require("csurf");
+const flash = require("connect-flash");
 
 // user defined modules
 const adminRoutes = require("./Routes/admin");
@@ -42,6 +44,16 @@ app.use(
   })
 );
 
+const csrfProtection = csrf();
+app.use(csrfProtection);
+app.use(flash());
+
+app.use((req, res, next) => {
+  res.locals.isAuthenticated = req.session.isLoggedIn;
+  res.locals.csrfToken = req.csrfToken();
+  next();
+});
+
 app.use((req, res, next) => {
   if (!req.session.user) return next();
   Users.findById(req.session.user._id)
@@ -67,18 +79,6 @@ mongoose
   .connect(MONGODB_URI)
   .then(() => {
     console.log("db connected");
-    Users.findOne().then((user) => {
-      if (!user) {
-        user = new Users({
-          name: "Harshit",
-          email: "ha635987@gmail.com",
-          cart: {
-            items: [],
-          },
-        });
-        return user.save();
-      }
-    });
     app.listen(3000, () => console.log("server started"));
   })
   .catch(console.log);

@@ -6,9 +6,11 @@
         <li class="Header-item"><a href="/orders">Orders</a></li>
         <li class="Header-item"><a href="/admin/add-product">Add Products</a></li>
         <form action="/logout" method="post">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
             <button class="logout" type="submit">Logout</button>
         </form>
     <% } else { %>
         <li class="Header-item"><a href="/login">Login</a></li>
+        <li class="Header-item"><a href="/signup">Signup</a></li>
     <% } %>
 </ul>
