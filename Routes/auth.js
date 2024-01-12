@@ -12,4 +12,8 @@ routes.post("/login", handlers.postLogin);
 
 routes.post("/logout", handlers.postLogout);
 
+routes.get("/signup", handlers.getSignup);
+
+routes.post("/signup", handlers.postSignup);
+
 module.exports = routes;

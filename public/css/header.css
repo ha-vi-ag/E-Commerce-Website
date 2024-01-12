@@ -227,5 +227,20 @@ body {
 
 .logout:hover {
     background-color: black;
+}
 
+
+.user-message {
+    margin: auto;
+    /* border: 1px solid rgb(93, 93, 247); */
+    /* background-color: rgb(57, 79, 249); */
+    padding: 0.5rem;
+    border-radius: 3px;
+    text-align: center;
+}
+
+.user-message--error {
+    /* background-color: rgb(222, 124, 124); */
+    color: red;
+    border-color: red;
 }
