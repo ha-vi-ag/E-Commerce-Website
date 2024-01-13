@@ -8,7 +8,7 @@ exports.getAddProduct = (req, res, next) => {
 };
 
 exports.postAddProduct = (req, res, next) => {
-  const product = new Products({ ...req.body });
+  const product = new Products({ ...req.body, userId: req.user._id });
   // save method doesn't return promise but mongoose provide then and catch
   product
     .save()
@@ -20,7 +20,7 @@ exports.postAddProduct = (req, res, next) => {
 
 exports.getEditProduct = (req, res, next) => {
   // this is a static method
-  Products.find()
+  Products.find({ userId: req.user._id })
     .then((products) => {
       res.render("admin/edit-product", {
         pageTitle: "Edit Product",
@@ -32,21 +32,22 @@ exports.getEditProduct = (req, res, next) => {
 
 exports.editProduct = (req, res, next) => {
   const id = req.params.productId;
-  Products.find().then((products) => {
-    const product = products.filter((product) => product.id == id);
+  Products.findById({ _id: id }).then((product) => {
+    // const product = products.filter((product) => product.id == id);
     res.render("admin/edit-page", {
       pageTitle: "Edit Details",
-      product: product[0],
+      product: product,
     });
   });
 };
 
 exports.updateProduct = (req, res, next) => {
   const id = req.body.id;
-  Products.findById(id)
+  Products.findById({ _id: id, userId: req.user._id })
     .then((product) => {
       // product here will not be just only javascript object
       // instead mongoose return it as mongoose object
+
       product.title = req.body.title;
       product.price = req.body.price;
       product.imageUrl = req.body.imageUrl;
@@ -59,7 +60,8 @@ exports.updateProduct = (req, res, next) => {
 
 exports.deleteProduct = (req, res, next) => {
   const id = req.params.productId;
-  Products.findByIdAndDelete(id)
+  // Products.findByIdAndDelete(id)
+  Products.findOneAndDelete({ _id: id, userId: req.user._id })
     .then(() => {
       return Users.find();
     })
