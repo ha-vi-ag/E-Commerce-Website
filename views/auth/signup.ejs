@@ -10,11 +10,10 @@
             <div class="form-style-8">
                 <h2>Enter Details</h2>
                 <form action="/signup" method="POST">
-                    
                     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                    <input type="text" name="email" placeholder="Email" />
-                    <input type="password" name="password" placeholder="Password" />
-                    <input type="password" name="confirmPassword" placeholder="Confirm Password" />
+                    <input type="email" name="email" placeholder="Email" value="<%= oldInputs.email %>"/>
+                    <input type="password" name="password" placeholder="Password" value="<%= oldInputs.password %>"/>
+                    <input type="password" name="confirmPassword" placeholder="Confirm Password" value="<%= oldInputs.confirmPassword %>"/>
                     <% if(error) { %>
                         <div class="user-message user-message--error">
                             <%= error %>
