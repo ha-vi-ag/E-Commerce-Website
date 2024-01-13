@@ -13,8 +13,8 @@
                 <form action="/login" method="POST">
                     
                     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                    <input type="text" name="email" placeholder="Email"/>
-                    <input type="password" name="password" placeholder="Password"/>
+                    <input type="email" name="email" placeholder="Email" value="<%= oldInputs.email %>"/>
+                    <input type="password" name="password" placeholder="Password" value="<%= oldInputs.password %>"/>
                     <% if(error) { %>
                         <div class="user-message user-message--error">
                             <%= error %>

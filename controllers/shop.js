@@ -20,7 +20,10 @@ exports.getCart = (req, res, next) => {
         products: user.cart.items,
       });
     })
-    .catch(console.log);
+    .catch((err) => {
+      const error = new Error(err);
+      next(error);
+    });
 };
 
 exports.removeCartProduct = (req, res, next) => {
@@ -28,7 +31,10 @@ exports.removeCartProduct = (req, res, next) => {
   req.user
     .removeFromCart(id)
     .then(() => res.redirect("/cart"))
-    .catch(console.log);
+    .catch((err) => {
+      const error = new Error(err);
+      next(error);
+    });
 };
 
 exports.addToCart = (req, res, next) => {
@@ -36,7 +42,10 @@ exports.addToCart = (req, res, next) => {
   req.user
     .addToCart(id)
     .then(() => res.redirect("/cart"))
-    .catch(console.log);
+    .catch((err) => {
+      const error = new Error(err);
+      next(error);
+    });
 };
 
 exports.getOrders = (req, res, next) => {
@@ -71,6 +80,9 @@ exports.purchaseItems = (req, res, next) => {
         return req.user.save();
       })
       .then(() => res.redirect("/"))
-      .catch(console.log);
+      .catch((err) => {
+        const error = new Error(err);
+        next(error);
+      });
   });
 };

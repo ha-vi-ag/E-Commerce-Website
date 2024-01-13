@@ -3,15 +3,19 @@
 </head>
 <body>
     <%- include('../includes/header.ejs') %>
-
+    <% if(error) { %>
+        <div class="user-message user-message--error">
+            <%= error %>
+        </div>
+    <% } %>
     <div class="form-style-8">
         <h2>New Product Details</h2>
         <form action="/admin/add-product" method="POST">
             <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-            <input type="text" name="title" placeholder="Title" />
-            <input type="number" name="price" placeholder="Price" />
-            <input type="text" name="imageUrl" placeholder="ImageUrl" />
-            <textarea name="description" placeholder="Description"></textarea>
+            <input type="text" name="title" placeholder="Title" value="<%= oldInputs.title %>"/>
+            <input type="number" name="price" placeholder="Price" value="<%= oldInputs.price %>"/>
+            <input type="text" name="imageUrl" placeholder="ImageUrl" value="<%= oldInputs.imageUrl %>"/>
+            <textarea name="description" placeholder="Description"><%= oldInputs.description %></textarea>
             <button type="submit">Add Product</button>
         </form>
     </div>

@@ -4,11 +4,13 @@ const bcrypt = require("bcryptjs");
 const { validationResult } = require("express-validator");
 
 exports.getLogin = (req, res, next) => {
-  let msg = req.flash("error");
-  msg = msg.length > 0 ? msg[0] : null;
   res.render("auth/login", {
     pageTitle: "Login",
-    error: msg,
+    error: null,
+    oldInputs: {
+      email: "",
+      password: "",
+    },
   });
 };
 exports.postLogin = (req, res, next) => {
@@ -18,16 +20,28 @@ exports.postLogin = (req, res, next) => {
   Users.findOne({ email: email })
     .then((user) => {
       if (!user) {
-        req.flash("error", "Invalid email");
-        return res.redirect("/login");
+        return res.render("auth/login", {
+          pageTitle: "Login",
+          error: "Invalid Email",
+          oldInputs: {
+            email: email,
+            password: password,
+          },
+        });
       }
 
       bcrypt
         .compare(password, user.password)
         .then((status) => {
           if (status == false) {
-            req.flash("error", "wrong password");
-            return res.redirect("/login");
+            return res.render("auth/login", {
+              pageTitle: "Login",
+              error: "Wrong Password",
+              oldInputs: {
+                email: email,
+                password: password,
+              },
+            });
           }
           req.session.user = user;
           req.session.isLoggedIn = true;
@@ -41,7 +55,10 @@ exports.postLogin = (req, res, next) => {
           res.redirect("/login");
         });
     })
-    .catch(console.log);
+    .catch((err) => {
+      const error = new Error(err);
+      next(error);
+    });
 };
 
 exports.postLogout = (req, res, next) => {
@@ -54,11 +71,9 @@ exports.postLogout = (req, res, next) => {
 };
 
 exports.getSignup = (req, res, next) => {
-  let msg = req.flash("error");
-  msg = msg.length > 0 ? msg[0] : null;
   res.render("auth/signup", {
     pageTitle: "Signup",
-    error: msg,
+    error: null,
     oldInputs: {
       email: "",
       password: "",
@@ -100,5 +115,8 @@ exports.postSignup = (req, res, next) => {
         })
         .catch(console.log);
     })
-    .catch(console.log);
+    .catch((err) => {
+      const error = new Error(err);
+      next(error);
+    });
 };

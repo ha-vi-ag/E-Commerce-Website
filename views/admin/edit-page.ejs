@@ -5,12 +5,16 @@
     </head>
 <body>
         <%- include('../includes/header.ejs') %>
-
+        <% if(error) { %>
+            <div class="user-message user-message--error">
+                <%= error %>
+            </div>
+        <% } %>
         <div class="form-style-8">
             <h2>Edit Product Details</h2>
             <form action="/admin/edit-product" method="POST">
                 <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                <input type="hidden" name="id" value="<%= product.id %>">
+                <input type="hidden" name="id" value="<%= product._id %>">
                 <input type="text" name="title" placeholder="Title" value="<%= product.title %>"/>
                 <input type="number" name="price" placeholder="Price" value="<%= product.price %>"/>
                 <input type="text" name="imageUrl" placeholder="ImageUrl" value="<%= product.imageUrl %>"/>
