@@ -66,7 +66,10 @@ app.use((req, res, next) => {
       req.user = user;
       next();
     })
-    .catch(console.log);
+    .catch((err) => {
+      const error = new Error(err);
+      next(error);
+    });
 });
 
 app.use("/admin", adminRoutes);
@@ -84,4 +87,7 @@ mongoose
     console.log("db connected");
     app.listen(3000, () => console.log("server started"));
   })
-  .catch(console.log);
+  .catch((err) => {
+    const error = new Error(err);
+    next(error);
+  });
