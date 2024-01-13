@@ -1,8 +1,9 @@
 // third party packages
 const express = require("express");
-
+const { check } = require("express-validator");
 // user defined packages
 const handlers = require("../controllers/auth");
+const Users = require("../models/users");
 
 const routes = express.Router();
 
@@ -14,6 +15,35 @@ routes.post("/logout", handlers.postLogout);
 
 routes.get("/signup", handlers.getSignup);
 
-routes.post("/signup", handlers.postSignup);
+// check() function will eventually return a middlware
+routes.post(
+  "/signup",
+  [
+    check("email")
+      .isEmail()
+      .withMessage("Please enter the valid email")
+      .custom((value, { req }) => {
+        return Users.findOne({ email: value }).then((user) => {
+          if (user) {
+            return Promise.reject("Email already exists");
+          }
+        });
+      }),
+
+    check(
+      "password",
+      "Password must contain only alphanumeric characters and minimum of length 5"
+    )
+      .isLength({ min: 5 })
+      .isAlphanumeric(),
+
+    check("confirmPassword").custom((value, { req }) => {
+      if (value !== req.body.password) {
+        throw new Error("Password should match");
+      } else return true;
+    }),
+  ],
+  handlers.postSignup
+);
 
 module.exports = routes;
