@@ -22,6 +22,7 @@ routes.post(
     check("email")
       .isEmail()
       .withMessage("Please enter the valid email")
+      .normalizeEmail()
       .custom((value, { req }) => {
         return Users.findOne({ email: value }).then((user) => {
           if (user) {
@@ -35,13 +36,16 @@ routes.post(
       "Password must contain only alphanumeric characters and minimum of length 5"
     )
       .isLength({ min: 5 })
-      .isAlphanumeric(),
+      .isAlphanumeric()
+      .trim(),
 
-    check("confirmPassword").custom((value, { req }) => {
-      if (value !== req.body.password) {
-        throw new Error("Password should match");
-      } else return true;
-    }),
+    check("confirmPassword")
+      .trim()
+      .custom((value, { req }) => {
+        if (value !== req.body.password) {
+          throw new Error("Password should match");
+        } else return true;
+      }),
   ],
   handlers.postSignup
 );

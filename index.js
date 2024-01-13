@@ -1,4 +1,6 @@
+// core modules
 const path = require("path");
+
 // third party packages
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -12,8 +14,9 @@ const flash = require("connect-flash");
 const adminRoutes = require("./Routes/admin");
 const shopRoutes = require("./Routes/shop");
 const authRoutes = require("./Routes/auth");
-
+const errorHandler = require("./controllers/error");
 const Users = require("./models/users");
+
 const app = express();
 
 // templating engine
@@ -26,9 +29,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // static serving files
 app.use(express.static(path.join(__dirname, "public")));
 
+// some constant
 const MONGODB_URI =
   "mongodb+srv://ha_vi_ag:5XXCXkW7N6S4Efq5@cluster0.ifwhghb.mongodb.net/ecart?retryWrites=true&w=majority";
-
 const store = new MongodbStore({
   uri: MONGODB_URI,
   collection: "sessions",
@@ -44,7 +47,9 @@ app.use(
   })
 );
 
+// some constants
 const csrfProtection = csrf();
+
 app.use(csrfProtection);
 app.use(flash());
 
@@ -68,12 +73,10 @@ app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
 
-app.use("/", (req, res, next) => {
-  res.render("404", {
-    pageTitle: "Error",
-    isAuthenticated: req.session.isLoggedIn,
-  });
-});
+app.use("/", errorHandler.get404);
+
+// error handling routes
+app.use(errorHandler.get500);
 
 mongoose
   .connect(MONGODB_URI)
