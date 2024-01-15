@@ -8,25 +8,18 @@
 
         <%- include('../includes/header.ejs') %>
 
-        <% if (records.length <= 0) { %>
+        <% if (orders.length <= 0) { %>
             <h1>No Order Details</h1>
         <% } else { %>
-            <% records.forEach(records => { %>
-                <% records.forEach(record => { %>
-                <div class="cartItem">
-                    <div class="cartImage">
-                        <img src="<%= record.products.imageUrl %>" alt="productImage">
-                    </div>
-                    <div class="cartProductDetails">
-                        <div>Title: <%= record.products.title %>
-                        </div>
-                        <div>Price: $<%= record.products.price %>
-                        </div>
-                        <div>Quantity: <%= record.quantity %>
-                        </div> 
-                    </div>
-                </div>
+            <% orders.forEach(order => { %>
+                <h3>Order Id: <%= order.orderId %> <a class='invoice-link' href="/order-invoice/<%= order.orderId %>">Invoice</a>
+                </h3>
+                <ul>
+                <% order.products.forEach(product => { %>
+                    <li class="order"><%= product.productDetails.title %> (Quantity: <%= product.quantity %>)</li>
                 <% }); %>
+                </ul>  
+                <hr>              
             <% }); %>
         <% } %>
 

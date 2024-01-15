@@ -17,7 +17,6 @@ routes.post(
   [
     check("title").trim(),
     check("price").isNumeric().withMessage("Price must be in number"),
-    check("imageUrl").isURL().withMessage("Please enter right image url"),
     check("description").trim(),
   ],
   handlers.postAddProduct
@@ -36,7 +35,6 @@ routes.post(
   [
     check("title").trim(),
     check("price").isNumeric().withMessage("Price must be in number"),
-    check("imageUrl").isURL().withMessage("Please enter right image url"),
     check("description").trim(),
   ],
   handlers.updateProduct

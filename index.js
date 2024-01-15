@@ -9,6 +9,7 @@ const session = require("express-session");
 const MongodbStore = require("connect-mongodb-session")(session);
 const csrf = require("csurf");
 const flash = require("connect-flash");
+const multer = require("multer");
 
 // user defined modules
 const adminRoutes = require("./Routes/admin");
@@ -23,11 +24,42 @@ const app = express();
 app.set("view engine", "ejs");
 app.set("views", "views");
 
+// some constant
+const fileStorage = multer.diskStorage({
+  destination: (req, file, callback) => {
+    callback(null, "images");
+  },
+  filename: (req, file, callback) => {
+    // note here we need to replace colons (:) from the file path
+    // The issue is that ":" is not allowed in a Windows file name.
+    callback(
+      null,
+      new Date().toISOString().replace(/:/g, "-") + "-" + file.originalname
+    );
+  },
+});
+
+const fileFilter = (req, file, callback) => {
+  if (
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpg" ||
+    file.mimetype === "image/jpeg"
+  ) {
+    callback(null, true);
+  } else {
+    callback(null, false);
+  }
+};
+
 // middlewares
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(
+  multer({ storage: fileStorage, fileFilter: fileFilter }).single("image")
+);
 
 // static serving files
 app.use(express.static(path.join(__dirname, "public")));
+app.use("/images", express.static(path.join(__dirname, "images")));
 
 // some constant
 const MONGODB_URI =

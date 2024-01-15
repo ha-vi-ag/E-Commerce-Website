@@ -17,9 +17,9 @@
                 <input type="hidden" name="id" value="<%= product._id %>">
                 <input type="text" name="title" placeholder="Title" value="<%= product.title %>"/>
                 <input type="number" name="price" placeholder="Price" value="<%= product.price %>"/>
-                <input type="text" name="imageUrl" placeholder="ImageUrl" value="<%= product.imageUrl %>"/>
                 <textarea name="description" placeholder="Description"><%= product.description %></textarea>
-                <button type="submit">Save Changes</button>
+                <input type="file" name="image" />
+                <div style="margin-top: 5px;"><button type="submit">Save Changes</button></div>
             </form>
         </div>
 
