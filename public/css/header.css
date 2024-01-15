@@ -244,3 +244,7 @@ body {
     color: red;
     border-color: red;
 }
+
+.invoice-link {
+    color: blue;
+}

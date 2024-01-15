@@ -1,6 +1,7 @@
 const Products = require("../models/products");
 const Users = require("../models/users");
 const Orders = require("../models/orders");
+const PdfDocument = require("pdfkit");
 
 exports.getHome = (req, res, next) => {
   Products.find().then((products) => {
@@ -49,11 +50,14 @@ exports.addToCart = (req, res, next) => {
 };
 
 exports.getOrders = (req, res, next) => {
-  Orders.find({ "user.userId": req.user.id }).then((records) => {
-    records = records.map((rec) => rec.products);
+  Orders.find({ "user.userId": req.user.id }).then((orders) => {
+    orders = orders.map((rec) => ({
+      products: rec.products,
+      orderId: rec._id,
+    }));
     res.render("shop/orders", {
       pageTitle: "Orders",
-      records: records,
+      orders: orders,
     });
   });
 };
@@ -63,7 +67,7 @@ exports.purchaseItems = (req, res, next) => {
     const prods = user.cart.items.map((p) => {
       return {
         quantity: p.quantity,
-        products: { ...p.productId },
+        productDetails: { ...p.productId },
       };
     });
     const order = new Orders({
@@ -81,8 +85,34 @@ exports.purchaseItems = (req, res, next) => {
       })
       .then(() => res.redirect("/"))
       .catch((err) => {
-        const error = new Error(err);
-        next(error);
+        next(err);
       });
   });
+};
+
+exports.getInvoice = (req, res, next) => {
+  const orderId = req.params.orderId;
+  Orders.findById(orderId)
+    .then((order) => {
+      return order.products;
+    })
+    .then((products) => {
+      const pdfDoc = new PdfDocument();
+      pdfDoc.pipe(res);
+      pdfDoc.fontSize(15).text("Order Id: " + orderId);
+      pdfDoc.text("---");
+      let totalPrice = 0;
+      products.forEach((product) => {
+        const productDetails = product.productDetails;
+        const quantity = product.quantity;
+        totalPrice += quantity * productDetails.price;
+        pdfDoc.text(
+          `${productDetails.title} - ${quantity} x ${productDetails.price}`
+        );
+      });
+      pdfDoc.text("--------------------");
+      pdfDoc.text("Total Price: " + totalPrice);
+      pdfDoc.end();
+    })
+    .catch((err) => next(err));
 };

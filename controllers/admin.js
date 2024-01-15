@@ -1,6 +1,7 @@
 const Products = require("../models/products");
 const Users = require("../models/users");
 const { validationResult } = require("express-validator");
+const fileHandling = require("../utils/file-handling");
 
 exports.getAddProduct = (req, res, next) => {
   res.render("admin/add-product", {
@@ -9,14 +10,31 @@ exports.getAddProduct = (req, res, next) => {
     oldInputs: {
       title: "",
       price: "",
-      imageUrl: "",
       description: "",
     },
   });
 };
 
 exports.postAddProduct = (req, res, next) => {
-  const product = new Products({ ...req.body, userId: req.user._id });
+  const image = req.file;
+
+  if (!image) {
+    return res.status(422).render("admin/add-product", {
+      pageTitle: "Add Product",
+      error: "Attached file should be in png/jpg/jpeg format",
+      oldInputs: {
+        title: req.body.title,
+        price: req.body.price,
+        description: req.body.description,
+      },
+    });
+  }
+
+  const product = new Products({
+    ...req.body,
+    imageUrl: image.path,
+    userId: req.user._id,
+  });
   // save method doesn't return promise but mongoose provide then and catch
   const errors = validationResult(req);
 
@@ -27,7 +45,6 @@ exports.postAddProduct = (req, res, next) => {
       oldInputs: {
         title: req.body.title,
         price: req.body.price,
-        imageUrl: req.body.imageUrl,
         description: req.body.description,
       },
     });
@@ -85,7 +102,6 @@ exports.updateProduct = (req, res, next) => {
       product: {
         title: req.body.title,
         price: req.body.price,
-        imageUrl: req.body.imageUrl,
         description: req.body.description,
         _id: id,
       },
@@ -99,7 +115,9 @@ exports.updateProduct = (req, res, next) => {
 
       product.title = req.body.title;
       product.price = req.body.price;
-      product.imageUrl = req.body.imageUrl;
+      if (req.file) {
+        product.imageUrl = req.file.path;
+      }
       product.description = req.body.description;
       return product.save();
     })
@@ -113,17 +131,22 @@ exports.updateProduct = (req, res, next) => {
 exports.deleteProduct = (req, res, next) => {
   const id = req.params.productId;
   // Products.findByIdAndDelete(id)
-  Products.findOneAndDelete({ _id: id, userId: req.user._id })
-    .then(() => {
-      return Users.find();
-    })
-    .then((users) => {
-      const promiseArray = users.map((user) => user.removeFromCart(id));
-      return Promise.all(promiseArray);
-    })
-    .then(() => res.redirect("/admin/edit-product"))
-    .catch((err) => {
-      const error = new Error(err);
-      next(error);
-    });
+  Products.findOne({ _id: id, userId: req.user._id }).then((product) => {
+    if (!product) return res.redirect("/");
+    const path = product.imageUrl;
+    fileHandling.deleteFile(path);
+    Products.findOneAndDelete({ _id: id, userId: req.user._id })
+      .then(() => {
+        return Users.find();
+      })
+      .then((users) => {
+        const promiseArray = users.map((user) => user.removeFromCart(id));
+        return Promise.all(promiseArray);
+      })
+      .then(() => res.redirect("/admin/edit-product"))
+      .catch((err) => {
+        const error = new Error(err);
+        next(error);
+      });
+  });
 };

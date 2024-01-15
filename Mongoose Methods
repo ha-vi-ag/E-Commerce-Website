@@ -7,3 +7,15 @@ Static methods:-
 Normal methods:- 
 
 # save() 
+
+
+# Points need to kept in mind
+
+1. while using multer :- The images folder needs to be created before running the app. dest automatically creates the images folder 
+                         howerver on using storage it didn't create. 
+
+
+
+# search following points to make it clear
+
+1. absolute and relative file paths and when to use which 

@@ -19,4 +19,6 @@ routes.get("/remove-from-cart/:productId", isAuth, handlers.removeCartProduct);
 
 routes.get("/purchase", isAuth, handlers.purchaseItems);
 
+routes.get("/order-invoice/:orderId", isAuth, handlers.getInvoice);
+
 module.exports = routes;
