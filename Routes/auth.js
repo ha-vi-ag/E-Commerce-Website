@@ -23,12 +23,11 @@ routes.post(
       .isEmail()
       .withMessage("Please enter the valid email")
       .normalizeEmail()
-      .custom((value, { req }) => {
-        return Users.findOne({ email: value }).then((user) => {
-          if (user) {
-            return Promise.reject("Email already exists");
-          }
-        });
+      .custom(async (value, { req }) => {
+        const user = await Users.findOne({ email: value });
+        if (user) {
+          return Promise.reject("Email already exists");
+        }
       }),
 
     check(

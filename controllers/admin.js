@@ -15,7 +15,7 @@ exports.getAddProduct = (req, res, next) => {
   });
 };
 
-exports.postAddProduct = (req, res, next) => {
+exports.postAddProduct = async (req, res, next) => {
   const image = req.file;
 
   if (!image) {
@@ -49,50 +49,47 @@ exports.postAddProduct = (req, res, next) => {
       },
     });
   }
-  product
-    .save()
-    .then((result) => {
-      res.redirect("/");
-    })
-    .catch((err) => {
-      const error = new Error(err);
-      next(error);
-    });
+
+  try {
+    await product.save();
+    res.redirect("/");
+  } catch (err) {
+    const error = new Error(err);
+    next(error);
+  }
 };
 
-exports.getEditProduct = (req, res, next) => {
-  // this is a static method
-  Products.find({ userId: req.user._id })
-    .then((products) => {
-      res.render("admin/edit-product", {
-        pageTitle: "Edit Product",
-        products: products,
-      });
-    })
-    .catch((err) => {
-      const error = new Error(err);
-      next(error);
+exports.getEditProduct = async (req, res, next) => {
+  try {
+    const products = await Products.find({ userId: req.user._id });
+    res.render("admin/edit-product", {
+      pageTitle: "Edit Product",
+      products: products,
     });
+  } catch (err) {
+    const error = new Error(err);
+    next(error);
+  }
 };
 
-exports.editProduct = (req, res, next) => {
+exports.editProduct = async (req, res, next) => {
   const id = req.params.productId;
-  Products.findById({ _id: id })
-    .then((product) => {
-      res.render("admin/edit-page", {
-        error: null,
-        pageTitle: "Edit Details",
-        error: null,
-        product: product,
-      });
-    })
-    .catch((err) => {
-      const error = new Error(err);
-      next(error);
+
+  try {
+    const product = await Products.findById({ _id: id });
+    res.render("admin/edit-page", {
+      error: null,
+      pageTitle: "Edit Details",
+      error: null,
+      product: product,
     });
+  } catch (err) {
+    const error = new Error(err);
+    next(error);
+  }
 };
 
-exports.updateProduct = (req, res, next) => {
+exports.updateProduct = async (req, res, next) => {
   const id = req.body.id;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -108,45 +105,41 @@ exports.updateProduct = (req, res, next) => {
     });
   }
 
-  Products.findById({ _id: id, userId: req.user._id })
-    .then((product) => {
-      // product here will not be just only javascript object
-      // instead mongoose return it as mongoose object
-
-      product.title = req.body.title;
-      product.price = req.body.price;
-      if (req.file) {
-        product.imageUrl = req.file.path;
-      }
-      product.description = req.body.description;
-      return product.save();
-    })
-    .then(() => res.redirect("/"))
-    .catch((err) => {
-      const error = new Error(err);
-      next(error);
+  try {
+    const product = await Products.findById({
+      _id: id,
+      userId: req.user._id,
     });
+    product.title = req.body.title;
+    product.price = req.body.price;
+    if (req.file) {
+      product.imageUrl = req.file.path;
+    }
+    product.description = req.body.description;
+    await product.save();
+    res.redirect("/");
+  } catch (err) {
+    const error = new Error(err);
+    next(error);
+  }
 };
 
-exports.deleteProduct = (req, res, next) => {
+exports.deleteProduct = async (req, res, next) => {
   const id = req.params.productId;
-  // Products.findByIdAndDelete(id)
-  Products.findOne({ _id: id, userId: req.user._id }).then((product) => {
+  try {
+    const product = await Products.findOne({ _id: id, userId: req.user._id });
     if (!product) return res.redirect("/");
     const path = product.imageUrl;
     fileHandling.deleteFile(path);
-    Products.findOneAndDelete({ _id: id, userId: req.user._id })
-      .then(() => {
-        return Users.find();
-      })
-      .then((users) => {
-        const promiseArray = users.map((user) => user.removeFromCart(id));
-        return Promise.all(promiseArray);
-      })
-      .then(() => res.redirect("/admin/edit-product"))
-      .catch((err) => {
-        const error = new Error(err);
-        next(error);
-      });
-  });
+    await Products.findOneAndDelete({ _id: id, userId: req.user._id });
+    const users = await Users.find();
+    const promiseArray = users.map(
+      async (user) => await user.removeFromCart(id)
+    );
+    await Promise.all(promiseArray);
+    res.redirect("/admin/edit-product");
+  } catch (err) {
+    const error = new Error(err);
+    next(error);
+  }
 };
