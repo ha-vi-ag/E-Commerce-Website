@@ -17,6 +17,7 @@ const shopRoutes = require("./Routes/shop");
 const authRoutes = require("./Routes/auth");
 const errorHandler = require("./controllers/error");
 const Users = require("./models/users");
+const { start } = require("repl");
 
 const app = express();
 
@@ -91,17 +92,24 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
   if (!req.session.user) return next();
-  Users.findById(req.session.user._id)
-    .then((user) => {
-      req.user = user;
-      next();
-    })
-    .catch((err) => {
-      const error = new Error(err);
-      next(error);
-    });
+  // Users.findById(req.session.user._id)
+  //   .then((user) => {
+  //     req.user = user;
+  //     next();
+  //   })
+  //   .catch((err) => {
+  //     const error = new Error(err);
+  //     next(error);
+  //   });
+  try {
+    const user = await Users.findById(req.session.user._id);
+    req.user = user;
+    next();
+  } catch (err) {
+    next(err);
+  }
 });
 
 app.use("/admin", adminRoutes);
@@ -113,13 +121,14 @@ app.use("/", errorHandler.get404);
 // error handling routes
 app.use(errorHandler.get500);
 
-mongoose
-  .connect(MONGODB_URI)
-  .then(() => {
+async function startServer() {
+  try {
+    await mongoose.connect(MONGODB_URI);
     console.log("db connected");
     app.listen(3000, () => console.log("server started"));
-  })
-  .catch((err) => {
-    const error = new Error(err);
-    next(error);
-  });
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+startServer();

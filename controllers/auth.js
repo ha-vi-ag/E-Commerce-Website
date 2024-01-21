@@ -13,52 +13,44 @@ exports.getLogin = (req, res, next) => {
     },
   });
 };
-exports.postLogin = (req, res, next) => {
+
+exports.postLogin = async (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
 
-  Users.findOne({ email: email })
-    .then((user) => {
-      if (!user) {
-        return res.render("auth/login", {
-          pageTitle: "Login",
-          error: "Invalid Email",
-          oldInputs: {
-            email: email,
-            password: password,
-          },
-        });
-      }
-
-      bcrypt
-        .compare(password, user.password)
-        .then((status) => {
-          if (status == false) {
-            return res.render("auth/login", {
-              pageTitle: "Login",
-              error: "Wrong Password",
-              oldInputs: {
-                email: email,
-                password: password,
-              },
-            });
-          }
-          req.session.user = user;
-          req.session.isLoggedIn = true;
-          req.session.save((err) => {
-            if (err) console.log(err);
-            res.redirect("/");
-          });
-        })
-        .catch((err) => {
-          console.log(err);
-          res.redirect("/login");
-        });
-    })
-    .catch((err) => {
-      const error = new Error(err);
-      next(error);
+  try {
+    const user = await Users.findOne({ email: email });
+    if (!user) {
+      return res.render("auth/login", {
+        pageTitle: "Login",
+        error: "Invalid Email",
+        oldInputs: {
+          email: email,
+          password: password,
+        },
+      });
+    }
+    const status = bcrypt.compare(password, user.password);
+    if (status == false) {
+      return res.render("auth/login", {
+        pageTitle: "Login",
+        error: "Wrong Password",
+        oldInputs: {
+          email: email,
+          password: password,
+        },
+      });
+    }
+    req.session.user = user;
+    req.session.isLoggedIn = true;
+    req.session.save((err) => {
+      if (err) console.log(err);
+      res.redirect("/");
     });
+  } catch (err) {
+    const error = new Error(err);
+    next(error);
+  }
 };
 
 exports.postLogout = (req, res, next) => {
@@ -82,7 +74,7 @@ exports.getSignup = (req, res, next) => {
   });
 };
 
-exports.postSignup = (req, res, next) => {
+exports.postSignup = async (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
   const errors = validationResult(req);
@@ -99,24 +91,17 @@ exports.postSignup = (req, res, next) => {
     });
   }
 
-  bcrypt
-    .hash(password, 12)
-    .then((hashedPassword) => {
-      const user = new Users({
-        email: email,
-        password: hashedPassword,
-        cart: { items: [] },
-      });
-
-      user
-        .save()
-        .then(() => {
-          res.redirect("/login");
-        })
-        .catch(console.log);
-    })
-    .catch((err) => {
-      const error = new Error(err);
-      next(error);
+  try {
+    const hashedPassword = await bcrypt.hash(password, 12);
+    const user = new Users({
+      email: email,
+      password: hashedPassword,
+      cart: { items: [] },
     });
+    await user.save();
+    res.redirect("/login");
+  } catch (err) {
+    const error = new Error(err);
+    next(error);
+  }
 };

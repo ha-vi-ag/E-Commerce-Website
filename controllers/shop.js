@@ -1,56 +1,54 @@
 const Products = require("../models/products");
-const Users = require("../models/users");
 const Orders = require("../models/orders");
 const PdfDocument = require("pdfkit");
 
-exports.getHome = (req, res, next) => {
-  Products.find().then((products) => {
+exports.getHome = async (req, res, next) => {
+  try {
+    const products = await Products.find();
     res.render("shop/shop", {
       pageTitle: "Shop",
       products: products,
     });
-  });
+  } catch (err) {
+    next(err);
+  }
 };
 
-exports.getCart = (req, res, next) => {
-  req.user
-    .populate("cart.items.productId")
-    .then((user) => {
-      res.render("shop/cart", {
-        pageTitle: "Cart",
-        products: user.cart.items,
-      });
-    })
-    .catch((err) => {
-      const error = new Error(err);
-      next(error);
+exports.getCart = async (req, res, next) => {
+  try {
+    const user = await req.user.populate("cart.items.productId");
+    res.render("shop/cart", {
+      pageTitle: "Cart",
+      products: user.cart.items,
     });
+  } catch (err) {
+    next(err);
+  }
 };
 
-exports.removeCartProduct = (req, res, next) => {
+exports.removeCartProduct = async (req, res, next) => {
   const id = req.params.productId;
-  req.user
-    .removeFromCart(id)
-    .then(() => res.redirect("/cart"))
-    .catch((err) => {
-      const error = new Error(err);
-      next(error);
-    });
+  try {
+    await req.user.removeFromCart(id);
+    res.redirect("/cart");
+  } catch (err) {
+    next(err);
+  }
 };
 
-exports.addToCart = (req, res, next) => {
+exports.addToCart = async (req, res, next) => {
   const id = req.params.productId;
-  req.user
-    .addToCart(id)
-    .then(() => res.redirect("/cart"))
-    .catch((err) => {
-      const error = new Error(err);
-      next(error);
-    });
+  try {
+    await req.user.addToCart(id);
+    res.redirect("/cart");
+  } catch (err) {
+    next(err);
+  }
 };
 
-exports.getOrders = (req, res, next) => {
-  Orders.find({ "user.userId": req.user.id }).then((orders) => {
+exports.getOrders = async (req, res, next) => {
+  try {
+    let orders = await Orders.find({ "user.userId": req.user.id });
     orders = orders.map((rec) => ({
       products: rec.products,
       orderId: rec._id,
@@ -59,11 +57,14 @@ exports.getOrders = (req, res, next) => {
       pageTitle: "Orders",
       orders: orders,
     });
-  });
+  } catch (err) {
+    next(err);
+  }
 };
 
-exports.purchaseItems = (req, res, next) => {
-  req.user.populate("cart.items.productId").then((user) => {
+exports.purchaseItems = async (req, res, next) => {
+  try {
+    const user = await req.user.populate("cart.items.productId");
     const prods = user.cart.items.map((p) => {
       return {
         quantity: p.quantity,
@@ -77,42 +78,37 @@ exports.purchaseItems = (req, res, next) => {
         userId: req.user,
       },
     });
-    order
-      .save()
-      .then(() => {
-        req.user.cart = { items: [] };
-        return req.user.save();
-      })
-      .then(() => res.redirect("/"))
-      .catch((err) => {
-        next(err);
-      });
-  });
+    await order.save();
+    req.user.cart = { items: [] };
+    await req.user.save();
+    res.redirect("/");
+  } catch (err) {
+    next(err);
+  }
 };
 
-exports.getInvoice = (req, res, next) => {
+exports.getInvoice = async (req, res, next) => {
   const orderId = req.params.orderId;
-  Orders.findById(orderId)
-    .then((order) => {
-      return order.products;
-    })
-    .then((products) => {
-      const pdfDoc = new PdfDocument();
-      pdfDoc.pipe(res);
-      pdfDoc.fontSize(15).text("Order Id: " + orderId);
-      pdfDoc.text("---");
-      let totalPrice = 0;
-      products.forEach((product) => {
-        const productDetails = product.productDetails;
-        const quantity = product.quantity;
-        totalPrice += quantity * productDetails.price;
-        pdfDoc.text(
-          `${productDetails.title} - ${quantity} x ${productDetails.price}`
-        );
-      });
-      pdfDoc.text("--------------------");
-      pdfDoc.text("Total Price: " + totalPrice);
-      pdfDoc.end();
-    })
-    .catch((err) => next(err));
+  try {
+    const order = await Orders.findById(orderId);
+    const products = order.products;
+    const pdfDoc = new PdfDocument();
+    pdfDoc.pipe(res);
+    pdfDoc.fontSize(15).text("Order Id: " + orderId);
+    pdfDoc.text("---");
+    let totalPrice = 0;
+    products.forEach((product) => {
+      const productDetails = product.productDetails;
+      const quantity = product.quantity;
+      totalPrice += quantity * productDetails.price;
+      pdfDoc.text(
+        `${productDetails.title} - ${quantity} x ${productDetails.price}`
+      );
+    });
+    pdfDoc.text("--------------------");
+    pdfDoc.text("Total Price: " + totalPrice);
+    pdfDoc.end();
+  } catch (err) {
+    next(err);
+  }
 };
