@@ -17,7 +17,6 @@ const shopRoutes = require("./Routes/shop");
 const authRoutes = require("./Routes/auth");
 const errorHandler = require("./controllers/error");
 const Users = require("./models/users");
-const { start } = require("repl");
 
 const app = express();
 
@@ -65,6 +64,7 @@ app.use("/images", express.static(path.join(__dirname, "images")));
 // some constant
 const MONGODB_URI =
   "mongodb+srv://ha_vi_ag:5XXCXkW7N6S4Efq5@cluster0.ifwhghb.mongodb.net/ecart?retryWrites=true&w=majority";
+
 const store = new MongodbStore({
   uri: MONGODB_URI,
   collection: "sessions",
@@ -93,16 +93,10 @@ app.use((req, res, next) => {
 });
 
 app.use(async (req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Authorisation, Content-Type");
   if (!req.session.user) return next();
-  // Users.findById(req.session.user._id)
-  //   .then((user) => {
-  //     req.user = user;
-  //     next();
-  //   })
-  //   .catch((err) => {
-  //     const error = new Error(err);
-  //     next(error);
-  //   });
   try {
     const user = await Users.findById(req.session.user._id);
     req.user = user;
@@ -125,7 +119,7 @@ async function startServer() {
   try {
     await mongoose.connect(MONGODB_URI);
     console.log("db connected");
-    app.listen(3000, () => console.log("server started"));
+    app.listen(5000, () => console.log("server started"));
   } catch (err) {
     console.log(err);
   }
