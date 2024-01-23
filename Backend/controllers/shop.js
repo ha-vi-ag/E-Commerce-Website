@@ -5,7 +5,11 @@ const PdfDocument = require("pdfkit");
 exports.getHome = async (req, res, next) => {
   try {
     const products = await Products.find();
-    res.render("shop/shop", {
+    // res.render("shop/shop", {
+    //   pageTitle: "Shop",
+    //   products: products,
+    // });
+    return res.json({
       pageTitle: "Shop",
       products: products,
     });
@@ -17,7 +21,11 @@ exports.getHome = async (req, res, next) => {
 exports.getCart = async (req, res, next) => {
   try {
     const user = await req.user.populate("cart.items.productId");
-    res.render("shop/cart", {
+    // res.render("shop/cart", {
+    //   pageTitle: "Cart",
+    //   products: user.cart.items,
+    // });
+    return res.json({
       pageTitle: "Cart",
       products: user.cart.items,
     });
