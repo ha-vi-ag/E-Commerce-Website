@@ -1,0 +1,32 @@
+
+Components:- 
+
+1. Header 
+
+    * common to all page
+    * will get csrf token
+    * will get isAuthenticated status 
+
+2. Auth related Components:- 
+
+    a: Login 
+    b: SignUp
+
+3. Admin Components:- 
+
+    a: Edit product page 
+
+        *  
+
+    b: Add Product 
+    
+4. User Components:- 
+
+    a: All products list
+    b: Cart
+    c: Orders
+
+5. Error Components:- 
+
+    a: 404 page
+    b: 500 page

@@ -5,7 +5,7 @@ const PdfDocument = require("pdfkit");
 exports.getHome = async (req, res, next) => {
   try {
     const products = await Products.find();
-    // res.render("shop/shop", {
+    // return res.render("shop/shop", {
     //   pageTitle: "Shop",
     //   products: products,
     // });
