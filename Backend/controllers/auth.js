@@ -17,45 +17,43 @@ exports.getLogin = (req, res, next) => {
 exports.postLogin = async (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
-
   try {
     const user = await Users.findOne({ email: email });
     if (!user) {
-      return res.render("auth/login", {
-        pageTitle: "Login",
-        error: "Invalid Email",
-        oldInputs: {
-          email: email,
-          password: password,
-        },
-      });
+      return res.status(400).json({ error: "Email does not exists" });
     }
-    const status = bcrypt.compare(password, user.password);
+    const status = await bcrypt.compare(password, user.password);
     if (status == false) {
-      return res.render("auth/login", {
-        pageTitle: "Login",
-        error: "Wrong Password",
-        oldInputs: {
-          email: email,
-          password: password,
-        },
+      return res.status(400).json({
+        error: "Wrong password",
       });
     }
     req.session.user = user;
     req.session.isLoggedIn = true;
     req.session.save((err) => {
-      if (err) console.log(err);
-      res.redirect("/");
+      if (err) {
+        return res.status(500).json({
+          error: "Something error happened",
+        });
+      }
+      return res.status(200).json({
+        message: "Successful logged In"
+      });
     });
   } catch (err) {
-    const error = new Error(err);
-    next(error);
+    return res.status(500).json({
+      error: "Something error happened",
+    });
   }
 };
 
 exports.postLogout = (req, res, next) => {
   req.session.destroy((err) => {
-    if (err) console.log(err);
+    if (err) {
+      return res.status(500).json({
+        error: "Something error happened",
+      });
+    }
     else {
       res.redirect("/");
     }
@@ -101,7 +99,8 @@ exports.postSignup = async (req, res, next) => {
     await user.save();
     res.redirect("/login");
   } catch (err) {
-    const error = new Error(err);
-    next(error);
+    return res.status(500).json({
+      error: "Something error happened",
+    });
   }
 };

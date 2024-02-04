@@ -1,11 +1,13 @@
 import React from 'react'
 import { Header } from "../Header"
+import { UserContext } from "../../App";
 
 export const EditProduct = () => {
+  const { isAuthenticated, setIsAuthenticated } = React.useContext(UserContext);
   return (
     <div>
-        <Header isAuthenticate={true}/>
-        Edit page
+      <Header userHandle={{ isAuthenticated, setIsAuthenticated }} />
+      Edit page
     </div>
-  )
+  );
 }

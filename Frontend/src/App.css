@@ -1,250 +1,42 @@
-body {
-    margin: 0;
-    padding: 0;
-}
-
-.Header {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    background-color: #333;
-}
-
-.Header-item {
-    float: left;
-}
-
-.Header-item a {
-    display: block;
-    color: white;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-}
-
-.Header-item a:hover {
-    background-color: #111;
-}
-
-.myform input {
-    width: 300px;
-    height: 25px;
-}
-
-.content {
-    margin-top: 3%;
+.flex-container {
     display: flex;
     justify-content: space-around;
+    /* Adjust as needed */
+    align-items: center;
+    /* Adjust as needed */
 }
 
 .card {
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-    max-width: 300px;
-    margin: auto;
-    text-align: center;
-    font-family: arial;
-    padding: 10px 10px 20px 10px;
-}
-
-.price {
-    color: grey;
-    font-size: 22px;
-}
-
-.card a {
-    border: none;
-    outline: 0;
-    padding: 12px;
-    color: white;
-    background-color: #000;
-    text-align: center;
-    cursor: pointer;
-    width: 100%;
-    font-size: 18px;
-    text-decoration: none;
-}
-
-.card button:hover {
-    opacity: 0.7;
-}
-
-.card div.special {
-    display: flex;
-    justify-content: space-around;
-}
-
-.card div.special a {
-    background-color: black;
-    color: white;
-    padding: 8px 27px;
-    text-decoration: none;
-}
-
-.card div.special a:hover {
-    opacity: 0.7;
-}
-
-
-.form-style-8 {
-
-    font-family: 'Open Sans Condensed', arial, sans;
-    width: 500px;
-    padding: 30px;
-    background: #FFFFFF;
-    margin: 50px auto;
-    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.22);
-    -moz-box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.22);
-    -webkit-box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.22);
-
-}
-
-.form-style-8 h2 {
-    background: #4D4D4D;
-    text-transform: uppercase;
-    font-family: 'Open Sans Condensed', sans-serif;
-    color: #797979;
-    font-size: 18px;
-    font-weight: 100;
+    width: 250px;
+    /* Adjust as needed */
+    border: 1px solid #ccc;
+    border-radius: 5px;
     padding: 20px;
-    margin: -30px -30px 30px -30px;
+    margin: 10px;
+    transition: all 0.3s ease;
+    /* Add transition for smooth hover effect */
 }
 
-.form-style-8 input[type="text"],
-.form-style-8 input[type="date"],
-.form-style-8 input[type="datetime"],
-.form-style-8 input[type="email"],
-.form-style-8 input[type="number"],
-.form-style-8 input[type="search"],
-.form-style-8 input[type="time"],
-.form-style-8 input[type="url"],
-.form-style-8 input[type="password"],
-.form-style-8 textarea,
-.form-style-8 select {
-    box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    outline: none;
-    display: block;
+.card:hover {
+    transform: translateY(-5px);
+    /* Move card up on hover */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    /* Add shadow effect on hover */
+}
+
+.card img {
     width: 100%;
-    padding: 7px;
-    border: none;
-    border-bottom: 1px solid #ddd;
-    background: transparent;
-    margin-bottom: 10px;
-    font: 16px Arial, Helvetica, sans-serif;
-    height: 45px;
+    height: auto;
 }
 
-.form-style-8 textarea {
-    resize: none;
-    overflow: hidden;
-}
-
-.form-style-8 input[type="button"],
-.form-style-8 input[type="submit"] {
-    -moz-box-shadow: inset 0px 1px 0px 0px #45D6D6;
-    -webkit-box-shadow: inset 0px 1px 0px 0px #45D6D6;
-    box-shadow: inset 0px 1px 0px 0px #45D6D6;
-    background-color: #2CBBBB;
-    border: 1px solid #27A0A0;
-    display: inline-block;
-    cursor: pointer;
-    color: #FFFFFF;
-    font-family: 'Open Sans Condensed', sans-serif;
-    font-size: 14px;
-    padding: 8px 18px;
-    text-decoration: none;
-    text-transform: uppercase;
-}
-
-.form-style-8 input[type="button"]:hover,
-.form-style-8 input[type="submit"]:hover {
-    background: linear-gradient(to bottom, #34CACA 5%, #30C9C9 100%);
-    background-color: #34CACA;
-}
-
-.form-style-8 button {
-    border: none;
-    background-color: #34CACA;
-    width: 110px;
-    height: 30px;
-}
-
-.form-style-8 button:hover {
-    background-color: #3aa2a2;
-    cursor: pointer;
-}
-
-
-.cartItem {
-    display: flex;
-    margin: 5px;
-    column-gap: 1%;
-}
-
-.cartItem .cartProductDetails {
-    display: 'block';
-}
-
-.cartItem img {
-    width: 150px;
-    height: 150px;
-}
-
-
-.cartProductDetails a {
-    text-decoration: none;
-    border: none;
-    border-bottom: blue 1px solid;
-    padding-bottom: 5px;
-    color: blue;
-}
-
-.cartProductDetails .remove-link {
-    margin-top: 10px;
-}
-
-.purchase a {
-    text-decoration: none;
-    color: red;
-    font-size: 25px;
-}
-
-.purchase {
+.card-info {
     text-align: center;
 }
 
-.logout {
-    color: white;
-    border: none;
-    margin-top: 13px;
-    cursor: pointer;
-    font-size: 15px;
-    background: none;
-    font-family: Arial, Helvetica, sans-serif;
+.card-info h2 {
+    margin-top: 0;
 }
 
-.logout:hover {
-    background-color: black;
-}
-
-
-.user-message {
-    margin: auto;
-    /* border: 1px solid rgb(93, 93, 247); */
-    /* background-color: rgb(57, 79, 249); */
-    padding: 0.5rem;
-    border-radius: 3px;
-    text-align: center;
-}
-
-.user-message--error {
-    /* background-color: rgb(222, 124, 124); */
-    color: red;
-    border-color: red;
-}
-
-.invoice-link {
-    color: blue;
+.card-info p {
+    margin-bottom: 5px;
 }

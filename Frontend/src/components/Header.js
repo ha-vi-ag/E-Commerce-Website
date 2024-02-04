@@ -15,20 +15,18 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { useNavigate } from "react-router-dom";
-// import { Link } from "react-router-domButton"
 
-const drawerWidth = 240;
+const drawerWidth = 250;
 const navItems = [
   ["Products", 0, "/"],
   ["Edit Product", 1, "/admin/edit-product"],
   ["Cart", 1, "/user/cart"],
   ["Orders", 1, "/user/orders"],
   ["Add Product", 1, "/admin/add-product"],
-  ["Logout", 1, "/"],
-  ["Login", 2, "/auth/login"],
 ];
 
 export function Header(props) {
+  const {isAuthenticated, setIsAuthenticated} = props.userHandle;
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const navigate = useNavigate();
@@ -58,6 +56,15 @@ export function Header(props) {
     </Box>
   );
 
+  const handleLogin = () => {
+    navigate('/auth/login');
+  }
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    navigate('/');
+  }
+
   const container =
     window !== undefined ? () => window().document.body : undefined;
   return (
@@ -84,26 +91,14 @@ export function Header(props) {
           <Box sx={{ display: { xs: "none", sm: "block" } }}>
             {navItems.map((item) => {
               return item[1] !== 0 ? (
-                item[1] === 1 ? (
-                  props.isAuthenticated && (
-                    <Button
-                      key={item[0]}
-                      sx={{ color: "#fff" }}
-                      onClick={() => navigate(item[2])}
-                    >
-                      {item[0]}
-                    </Button>
-                  )
-                ) : (
-                  !props.isAuthenticated && (
-                    <Button
-                      key={item[0]}
-                      sx={{ color: "#fff" }}
-                      onClick={() => navigate(item[2])}
-                    >
-                      {item[0]}
-                    </Button>
-                  )
+                isAuthenticated && (
+                  <Button
+                    key={item[0]}
+                    sx={{ color: "#fff" }}
+                    onClick={() => navigate(item[2])}
+                  >
+                    {item[0]}
+                  </Button>
                 )
               ) : (
                 <Button
@@ -115,6 +110,22 @@ export function Header(props) {
                 </Button>
               );
             })}
+            {isAuthenticated && (
+              <Button
+                sx={{ color: "#fff" }}
+                onClick={handleLogout}
+              >
+                Logout
+              </Button>
+            )}
+            {!isAuthenticated && (
+              <Button
+                sx={{ color: "#fff" }}
+                onClick={handleLogin}
+              >
+                Login
+              </Button>
+            )}
           </Box>
         </Toolbar>
       </AppBar>
@@ -138,7 +149,7 @@ export function Header(props) {
           {drawer}
         </Drawer>
       </nav>
-      <Box component="main" sx={{ p: 1 }}>
+      <Box component="main" sx={{ p: 2 }}>
         <Toolbar />
       </Box>
     </Box>
